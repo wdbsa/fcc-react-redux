@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>React-Redux</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.2.0/redux.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/8.0.2/react-redux.min.js"></script>
+        <script type="text/babel">
+            // Redux:
+                    const ADD = 'ADD';
+
+                    const addMessage = (message) => {
+                        return {
+                            type: ADD,
+                            message
+                        }
+                    };
+
+                    const messageReducer = (state = [], action) => {
+                    switch (action.type) {
+                        case ADD:
+                            return [...state, action.message];
+                        default:
+                            return state;
+                    }
+                    };
+
+
+
+                    const store = Redux.createStore(messageReducer);
+
+                    // React:
+
+                    class DisplayMessages extends React.Component {
+                    constructor(props) {
+                        super(props);
+                        this.state = {
+                        input: '',
+                        messages: []
+                        }
+                        this.handleChange = this.handleChange.bind(this);
+                        this.submitMessage = this.submitMessage.bind(this);
+                    }
+                    handleChange(event) {
+                        this.setState({
+                        input: event.target.value
+                        });
+                    }
+                    submitMessage() {  
+                        this.setState((state) => {
+                        const currentMessage = state.input;
+                        return {
+                            input: '',
+                            messages: state.messages.concat(currentMessage)
+                        };
+                        });
+                    }
+                    render() {
+                        return (
+                        <div>
+                            <h2>Type in a new Message:</h2>
+                            <input value={this.state.input} onChange={this.handleChange}/><br/>
+                            <button onClick={this.submitMessage}>Submit</button>
+                            <ul>
+                            {this.state.messages.map( (message, idx) => {
+                                return (
+                                    <li key={idx}>{message}</li>
+                                )
+                                })
+                            }
+                            </ul>
+                        </div>
+                        );
+                    }
+                    };
+
+                    const Provider = ReactRedux.Provider;
+
+                    class AppWrapper extends React.Component {
+                    // Render the Provider below this line
+                    render() {
+                        return (
+                        <Provider store={store}>
+                            <DisplayMessages />
+                        </Provider>
+                        )
+                    }
+                    // Change code above this line
+                    };
+            
+                     ReactDOM.render(<AppWrapper />, document.querySelector("#app"));
+
+        </script>
+    </head>
+    <body>
+        <div id="app">
+
+        </div>
+    </body>
+</html>
