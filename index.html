@@ -15,7 +15,7 @@
                     const addMessage = (message) => {
                         return {
                             type: ADD,
-                            message
+                            message: message
                         }
                     };
 
@@ -34,62 +34,93 @@
 
                     // React:
 
-                    class DisplayMessages extends React.Component {
-                    constructor(props) {
-                        super(props);
-                        this.state = {
-                        input: '',
-                        messages: []
-                        }
-                        this.handleChange = this.handleChange.bind(this);
-                        this.submitMessage = this.submitMessage.bind(this);
-                    }
-                    handleChange(event) {
-                        this.setState({
-                        input: event.target.value
-                        });
-                    }
-                    submitMessage() {  
-                        this.setState((state) => {
-                        const currentMessage = state.input;
-                        return {
-                            input: '',
-                            messages: state.messages.concat(currentMessage)
-                        };
-                        });
-                    }
-                    render() {
-                        return (
-                        <div>
-                            <h2>Type in a new Message:</h2>
-                            <input value={this.state.input} onChange={this.handleChange}/><br/>
-                            <button onClick={this.submitMessage}>Submit</button>
-                            <ul>
-                            {this.state.messages.map( (message, idx) => {
-                                return (
-                                    <li key={idx}>{message}</li>
-                                )
-                                })
+
+                    (function() {
+                        console.log('test');
+                        fetch('https://my-burger-api.herokuapp.com/burgers/0')
+                            .then(response => response.json())
+                            .then(data => console.log(data));
+                    })();
+
+                    class Presentational extends React.Component {
+                        constructor(props) {
+                            super(props);
+                            this.state = {
+                                input: '',
+                                messages: []
                             }
-                            </ul>
-                        </div>
-                        );
+
+                            this.handleChange = this.handleChange.bind(this);
+                            this.submitMessage = this.submitMessage.bind(this);
+                        }
+
+                  
+
+                        handleChange(event) {
+                            this.setState({
+                                input: event.target.value
+                            })
+                        };
+
+                        submitMessage() {
+                            let messages = [...this.state.messages];
+                            messages.push(this.state.input);
+
+                            this.setState({
+                                input: '',
+                                messages: messages
+                        })
+                        
+                        };
+
+                  
+
+                        render() {
+                            return (
+                                <div>
+                                    <h2>Type in a new Messenger:</h2>
+                                    <input value={this.state.input} onChange={this.handleChange} />
+                                    <button onClick={this.submitMessage}>Submit</button>
+                                    <ul>
+                                        { this.state.messages.map((message,idx) => {
+                                            return <li key={idx}>{message}</li>
+                                        }) }
+                                    </ul>
+                                </div>
+                            )
+                        }
                     }
+
+                    //react-redux
+
+                    const mapStateToProps = (state) => {
+                        return { messages: state }
                     };
 
+                    const mapDispatchToProps = (dispatch) => {
+                        return {
+                            messages: (message) => { dispatch(addMessage(message)) }
+                        }
+                    };  
+
                     const Provider = ReactRedux.Provider;
+                    const connect = ReactRedux.connect;
+
+                    const Container = connect(mapStateToProps, mapDispatchToProps)(Presentational);
 
                     class AppWrapper extends React.Component {
                     // Render the Provider below this line
+
                     render() {
                         return (
                         <Provider store={store}>
-                            <DisplayMessages />
+                            <Container />
                         </Provider>
                         )
                     }
                     // Change code above this line
                     };
+
             
                      ReactDOM.render(<AppWrapper />, document.querySelector("#app"));
 
